@@ -1,0 +1,48 @@
+from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+import time
+import os
+
+# Test Case 1 -  Launch the Google Chrome browser and 
+navigate to https://in.bookmyshow.com
+chromeDriver = webdriver.Chrome()
+chromeDriver.get("https://in.bookmyshow.com")
+
+# Test Case 2 - Select “Hyderabad”
+citySelected = WebDriverWait(chromeDriver, 5).until(EC.presence_of_element_located((By.XPATH, "//span[text()='Hyderabad']")))
+
+citySelected.click()
+
+# Test Case 3 - On the home page scroll down and click on the movie “Fighter”
+chromeDriver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+time.sleep(2)  # Wait for the page to settle after scrolling
+fighter_movie = WebDriverWait(chromeDriver, 5).until(EC.presence_of_element_located((By.XPATH, "//div[@data-content='Fighter']")))
+fighter_movie.click()
+time.sleep(3)
+
+# Test Case 4 - On the movie page click on “Book tickets” and select the movie type as “2D”
+book_tickets_button = WebDriverWait(chromeDriver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[@data-phase='postRelease']")))
+book_tickets_button.click()
+time.sleep(3)
+
+movieOption = WebDriverWait(chromeDriver, 10).until(
+    EC.element_to_be_clickable((By.XPATH, "//span[text()='2D']")))
+movieOption.click()
+time.sleep(3)
+
+# Test Case 5 - Validate the actual link matches the provided link
+actual_link = chromeDriver.current_url
+expected_link = "https://in.bookmyshow.com/buytickets/fighter-hyderabad/movie-hyd-ET00304730-MT/"
+time.sleep(3)
+assert expected_link in actual_link, f"Link validation failed. Expected: {expected_link}, Actual: {actual_link}"
+
+# Capture screenshot and save it to Desktop
+systemPath = os.path.join(os.path.expanduser("~"), "Desktop")
+screenshot_path = os.path.join(systemPath, "screenshot.png")
+chromeDriver.save_screenshot(screenshot_path)
+
+# Test Case 6 - Close the browser
+chromeDriver.quit()
+
